@@ -3,6 +3,7 @@ class Node {
     this.data = data;
     this.left = null;
     this.right = null;
+    this.inorderList = [];
   }
 }
 
@@ -99,7 +100,6 @@ class Tree {
 
   find(data, root = this.root) {
     if (data == root.data || root == null) {
-      console.log(root);
       return root;
     }
     if (data < root.data) {
@@ -132,7 +132,12 @@ class Tree {
     }
   }
 
-  inorder(func, root = this.root) {
+  getListInorder() {
+    this.inorderList = [];
+    return this.inorder();
+  }
+
+  inorder(func = this.toArray, root = this.root) {
     if (!func) {
       return this.values;
     }
@@ -141,8 +146,10 @@ class Tree {
     }
 
     this.inorder(func, root.left);
-    func(root);
+    func(this.inorderList, root.data);
     this.inorder(func, root.right);
+
+    return this.inorderList;
   }
 
   preorder(func, root = this.root) {
@@ -169,20 +176,59 @@ class Tree {
     this.postorder(func, root.right);
     func(root);
   }
-}
 
-function log(val) {
-  console.log(val);
+  height(node) {
+    if (node === null) {
+      return 0;
+    }
+    const leftHeight = this.height(node.left);
+    const rightHeight = this.height(node.right);
+    return Math.max(leftHeight, rightHeight) + 1;
+  }
+
+  depth(node, root = this.root) {
+    if (root.data == node.data) {
+      return 0;
+    }
+    if (root.data > node.data) {
+      this.depth(root.left) + 1;
+    }
+    if (root.data < node.data) {
+      this.depth(root.right) + 1;
+    }
+  }
+
+  toArray(arr, value) {
+    arr.push(value);
+  }
+
+  isBalanced() {
+    const allNodes = this.getListInorder();
+    for (let i = 0; i < allNodes.length; i++) {
+      const node = this.find(allNodes[i]);
+      const leftSubtree = this.height(node.left);
+      const rightSubtree = this.height(node.right);
+      if (Math.abs(leftSubtree - rightSubtree) > 1) return false;
+    }
+    return true;
+  }
+
+  rebalance() {
+    if (!this.rebalance()) {
+      this.root = this.buildTree(this.getListInorder());
+    }
+    return;
+  }
 }
 
 const array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 
 const tree = new Tree(array);
 const root = tree.root;
-// tree.insert(24);
+tree.insert(24);
 console.log(tree.root);
-// tree.deleteNode(23);
+tree.deleteNode(23);
 console.log(tree.find(23));
 tree.prettyPrint(root);
-// tree.levelOrder(log);
-tree.postorder(log);
+tree.levelOrder(log);
+console.log(tree.isBalanced());
