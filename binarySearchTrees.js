@@ -28,7 +28,6 @@ class Tree {
     }
 
     let mid = parseInt((start + end) / 2, 10);
-    console.log(mid);
     let node = new Node(arr[mid]);
 
     node.left = this.sortedArrayToBST(arr, start, mid - 1);
@@ -132,6 +131,44 @@ class Tree {
       q.shift();
     }
   }
+
+  inorder(func, root = this.root) {
+    if (!func) {
+      return this.values;
+    }
+    if (root == null) {
+      return;
+    }
+
+    this.inorder(func, root.left);
+    func(root);
+    this.inorder(func, root.right);
+  }
+
+  preorder(func, root = this.root) {
+    if (!func) {
+      return this.values;
+    }
+    if (root == null) {
+      return;
+    }
+    func(root);
+    this.preorder(func, root.left);
+    this.preorder(func, root.right);
+  }
+
+  postorder(func, root = this.root) {
+    if (!func) {
+      return this.values;
+    }
+    if (root == null) {
+      return;
+    }
+
+    this.postorder(func, root.left);
+    this.postorder(func, root.right);
+    func(root);
+  }
 }
 
 function log(val) {
@@ -147,4 +184,5 @@ console.log(tree.root);
 // tree.deleteNode(23);
 console.log(tree.find(23));
 tree.prettyPrint(root);
-tree.levelOrder(log);
+// tree.levelOrder(log);
+tree.postorder(log);
