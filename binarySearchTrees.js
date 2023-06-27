@@ -8,11 +8,16 @@ class Node {
 
 class Tree {
   constructor(arr) {
+    this.values = this.sortArray(arr);
     this.root = this.buildTree(arr);
   }
 
+  sortArray(arr) {
+    return [...new Set(arr.sort((a, b) => a - b))];
+  }
+
   buildTree(arr) {
-    arr = [...new Set(arr.sort((a, b) => a - b))];
+    arr = this.sortArray(arr);
     const root = this.sortedArrayToBST(arr, 0, arr.length - 1);
     return root;
   }
@@ -22,7 +27,8 @@ class Tree {
       return null;
     }
 
-    let mid = parseInt((start + end) / 2);
+    let mid = parseInt((start + end) / 2, 10);
+    console.log(mid);
     let node = new Node(arr[mid]);
 
     node.left = this.sortedArrayToBST(arr, start, mid - 1);
@@ -91,13 +97,54 @@ class Tree {
     }
     return root;
   }
+
+  find(data, root = this.root) {
+    if (data == root.data || root == null) {
+      console.log(root);
+      return root;
+    }
+    if (data < root.data) {
+      return this.find(data, root.left);
+    } else if (data > root.data) {
+      return this.find(data, root.right);
+    }
+  }
+
+  levelOrder(func) {
+    if (!func) {
+      return this.values;
+    }
+    if (this.root == null) {
+      return;
+    }
+    const q = [];
+    q.push(this.root);
+
+    while (q.length > 0) {
+      let curr = q[0];
+      func(curr);
+      if (curr.left) {
+        q.push(curr.left);
+      }
+      if (curr.right) {
+        q.push(curr.right);
+      }
+      q.shift();
+    }
+  }
+}
+
+function log(val) {
+  console.log(val);
 }
 
 const array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 
 const tree = new Tree(array);
 const root = tree.root;
-tree.insert(24);
+// tree.insert(24);
 console.log(tree.root);
-tree.deleteNode(23);
+// tree.deleteNode(23);
+console.log(tree.find(23));
 tree.prettyPrint(root);
+tree.levelOrder(log);
