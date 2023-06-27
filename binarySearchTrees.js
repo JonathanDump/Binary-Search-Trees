@@ -1,6 +1,6 @@
 class Node {
   constructor(data) {
-    this.data = data || null;
+    this.data = data;
     this.left = null;
     this.right = null;
   }
@@ -8,18 +8,25 @@ class Node {
 
 class Tree {
   constructor(arr) {
-    this.root = this.buildTree(arr, 0, arr.length - 1);
+    this.root = this.buildTree(arr);
   }
-  buildTree(arr, start, end) {
+
+  buildTree(arr) {
     arr = [...new Set(arr.sort((a, b) => a - b))];
+    const root = this.sortedArrayToBST(arr, 0, arr.length - 1);
+    return root;
+  }
+
+  sortedArrayToBST(arr, start, end) {
     if (start > end) {
       return null;
     }
 
     let mid = parseInt((start + end) / 2);
     let node = new Node(arr[mid]);
-    node.left = this.buildTree(arr, start, mid - 1);
-    node.right = this.buildTree(arr, mid + 1, end);
+
+    node.left = this.sortedArrayToBST(arr, start, mid - 1);
+    node.right = this.sortedArrayToBST(arr, mid + 1, end);
     return node;
   }
 
@@ -53,93 +60,37 @@ class Tree {
 
     return node;
   }
+  minValue(node) {
+    let min = node.data;
+    while (node.left != null) {
+      min = node.left.data;
+      node = node.left;
+    }
+    return min;
+  }
 
   deleteNode(data, root = this.root) {
-    if (root === null) {
-      return null;
+    if (root == null) {
+      return root;
     }
 
     if (data < root.data) {
       root.left = this.deleteNode(data, root.left);
-      return root.left;
     } else if (data > root.data) {
       root.right = this.deleteNode(data, root.right);
-      return root.right;
+    } else {
+      if (root.left == null) {
+        return root.right;
+      }
+      if (root.right == null) {
+        return root.left;
+      }
+
+      root.data = this.minValue(root.right);
+      root.right = this.deleteNode(root.data, root.right);
     }
-    console.log(root);
-    root = null;
-    // if (root.left === null) {
-    //   let temp = root.right;
-    //   root = null;
-    //   return temp;
-    // } else if (root.right === null) {
-    //   let temp = root.left;
-    //   root = null;
-    //   return temp;
-    // }
+    return root;
   }
-
-  // deleteNode(k, root = this.root) {
-  //   // Base case
-  //   if (root === null) {
-  //     return root;
-  //   }
-
-  //   // Recursive calls for ancestors of
-  //   // node to be deleted
-  //   if (root.data > k) {
-  //     root.left = this.deleteNode(root.left, k);
-  //     return root;
-  //   } else if (root.data < k) {
-  //     root.right = this.deleteNode(root.right, k);
-  //     return root;
-  //   }
-
-  //   // We reach here when root is the node
-  //   // to be deleted.
-
-  //   // If one of the children is empty
-  //   if (root.left === null) {
-  //     let temp = root.right;
-  //     //   root = null;
-  //     return temp;
-  //   } else if (root.right === null) {
-  //     let temp = root.left;
-  //     //   root = null;
-  //     return temp;
-  //   }
-
-  //   // If both children exist
-  //   else {
-  //     let succParent = root;
-
-  //     // Find successor
-  //     let succ = root.right;
-  //     while (succ.left !== null) {
-  //       succParent = succ;
-  //       succ = succ.left;
-  //     }
-
-  //     // Delete successor.  Since successor
-  //     // is always left child of its parent
-  //     // we can safely make successor's right
-  //     // right child as left of its parent.
-  //     // If there is no succ, then assign
-  //     // succ.right to succParent.right
-  //     if (succParent !== root) {
-  //       succParent.left = succ.right;
-  //     } else {
-  //       succParent.right = succ.right;
-  //     }
-
-  //     // Copy Successor Data to root
-  //     root.data = succ.data;
-
-  //     // Delete Successor and return root
-  //     //   succ = null;
-  //     return root;
-  //   }
-  // }
 }
 
 const array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
